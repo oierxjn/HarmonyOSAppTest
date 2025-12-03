@@ -1,5 +1,11 @@
 import { BusinessError } from '@kit.BasicServicesKit';
 import { Second } from './Second';
+import { Third } from './Third';
+
+export enum PageName{
+  Second = "Second",
+  Third = "Third"
+}
 
 @Entry
 @Component
@@ -10,8 +16,11 @@ struct Index {
 
   @Builder
   pageMap(name: string){
-    if(name == 'HomePage'){
+    if(name == PageName.Second){
       Second()
+    }
+    if(name == PageName.Third){
+      Third()
     }
   }
 
@@ -37,7 +46,7 @@ struct Index {
           .width('40%')
           .height('5%')
           .onClick(() => {
-            this.navPathStack.pushPath({name : 'HomePage'})
+            this.navPathStack.pushPath({name : PageName.Second})
           })
         }.width('100%')
       }
