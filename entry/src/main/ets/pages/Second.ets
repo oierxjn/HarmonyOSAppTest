@@ -83,8 +83,6 @@ export struct Second {
   @Consume('navPathStack') navPathStack: NavPathStack
   arr: BasicDataSource = new BasicDataSource([1,2,3,4,5,6,7,8,9,10]);
 
-
-
   build() {
     NavDestination(){
       List({space: 20}){
@@ -121,6 +119,9 @@ export struct Second {
     .onBackPressed(() => {
       this.navPathStack.pop();
       return true;
+    })
+    .onVisibleAreaChange([0.0, 1.0], (isExpand, radio) => {
+      console.debug("调试可见区域变化")
     })
   }
 }
