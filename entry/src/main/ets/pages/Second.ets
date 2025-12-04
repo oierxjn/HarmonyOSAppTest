@@ -116,6 +116,14 @@ export struct Second {
                 .margin({top: 20})
                 .onClick(() => {
                   this.testCount1++;
+                  this.getUIContext().showAlertDialog({
+                    title: '警告弹窗',
+                    message: 'cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++',
+                    confirm: {
+                      value: '确认',
+                      action: () => {}
+                    }
+                  })
                 })
             }
             .width('40%')
