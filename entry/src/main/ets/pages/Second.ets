@@ -108,7 +108,7 @@ let testKVStore: distributedKVStore.SingleKVStore | undefined;
 
 @Component
 export struct Second {
-  @State message: string = 'Hi there';
+  @State message: string = (new Date()).toLocaleString();
 
   @State testCount1: number = 0;
 
@@ -118,16 +118,17 @@ export struct Second {
   async aboutToAppear(): Promise<void> {
     console.debug(`即将初始化数据库`)
     try {
-      testKVStore = await kvManager?.getKVStore<distributedKVStore.SingleKVStore>('testStore1', {
+      testKVStore = await kvManager!!.getKVStore<distributedKVStore.SingleKVStore>('testStore1', {
         securityLevel: distributedKVStore.SecurityLevel.S1
       })
       console.debug(`创建/获取数据库实例成功`)
       try {
-        let value = await testKVStore?.get(testCountKey)
+        let valueTask = testKVStore!!.get(testCountKey)
+        let value = await valueTask
+        this.testCount1 = value as number
         if(value == undefined) {
           throw new Error('键值为空')
         }
-        this.testCount1 = value as number
         console.debug(`获取数据成功：${value}`)
       } catch (error) {
         console.error(`获取数据失败：${error}`)
@@ -142,32 +143,40 @@ export struct Second {
       List({space: 20}){
         ListItem(){
           Row(){
-            Text('删除数据库')
-              .height('100%').fontSize(30)
-              .textAlign(TextAlign.Center).borderRadius(3)
-              .backgroundColor('#100D9FFB')
-              .onClick(async () => {
-                try {
-                  await testKVStore?.delete(testCountKey)
-                  console.debug(`删除数据成功`)
-                } catch (e){
-                  console.error(`删除数据失败：${e}`)
-                }
-              })
+            Column(){
+              Text('删除数据库')
+                .fontSize(30)
+                .textAlign(TextAlign.Center).borderRadius(3)
+                .backgroundColor('#100D9FFB')
+                .onClick(async () => {
+                  try {
+                    await testKVStore?.delete(testCountKey)
+                    console.debug(`删除数据成功`)
+                  } catch (e){
+                    console.error(`删除数据失败：${e}`)
+                  }
+                })
+              Text(this.message)
+                .fontSize(20)
+                .width('100%')
+                .textAlign(TextAlign.Center).borderRadius(3)
+                .backgroundColor('#100D9FFB')
+            }.width('60%')
             Column(){
               Button('Next')
                 .fontSize(25)
-                .width('80%')
+                .width('100%')
                 .margin({top: 20})
                 .onClick(() =>{
                   this.navPathStack.pushPath({name: PageName.Third})
                 })
               Button(this.testCount1.toString())
                 .fontSize(25)
-                .width('80%')
+                .width('100%')
                 .margin({top: 20})
                 .onClick(async () => {
-                  this.testCount1++;
+                  this.testCount1 =Date.now();
+                  this.message = (new Date(this.testCount1)).toLocaleString()
                   this.getUIContext().showAlertDialog(
                     buildAlertDialogParams(this.testCount1.toString(), 'Test')
                   )
