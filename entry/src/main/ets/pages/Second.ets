@@ -76,9 +76,19 @@ class BasicDataSource implements IDataSource{
   }
 }
 
+function fetchData(): Promise<string> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve("Data fetched successfully!");
+    }, 3000);
+  });
+}
+
 @Component
 export struct Second {
   @State message: string = 'Hi there';
+
+  @State testCount1: number = 0;
 
   @Consume('navPathStack') navPathStack: NavPathStack
   arr: BasicDataSource = new BasicDataSource([1,2,3,4,5,6,7,8,9,10]);
@@ -92,13 +102,23 @@ export struct Second {
               .height('100%').fontSize(30)
               .textAlign(TextAlign.Center).borderRadius(3)
               .backgroundColor('#100D9FFB')
-            Button('Next')
-              .fontSize(25)
-              .width('60%')
-              .margin({top: 20})
-              .onClick(() =>{
-                this.navPathStack.pushPath({name: PageName.Third})
-              })
+            Column(){
+              Button('Next')
+                .fontSize(25)
+                .width('80%')
+                .margin({top: 20})
+                .onClick(() =>{
+                  this.navPathStack.pushPath({name: PageName.Third})
+                })
+              Button(this.testCount1.toString())
+                .fontSize(25)
+                .width('80%')
+                .margin({top: 20})
+                .onClick(() => {
+                  this.testCount1++;
+                })
+            }
+            .width('40%')
           }
         }
         .width('100%').height('20%')
@@ -120,8 +140,12 @@ export struct Second {
       this.navPathStack.pop();
       return true;
     })
-    .onVisibleAreaChange([0.0, 1.0], (isExpand, radio) => {
-      console.debug("调试可见区域变化")
+    .onVisibleAreaChange([0.0, 1.0], async (isExpand, radio) => {
+      if (isExpand) {
+        const testResult = await fetchData()
+        console.debug(`调试得到结果：${testResult}`)
+        console.debug("调试可见区域展开")
+      }
     })
   }
 }
