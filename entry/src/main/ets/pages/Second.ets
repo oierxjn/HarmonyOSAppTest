@@ -1,5 +1,23 @@
+import { kvManager } from "../func/DataUtils";
 import { PageName } from "./Index";
 import { Third } from "./Third";
+import { distributedKVStore } from "@kit.ArkData";
+
+export function buildAlertDialogParams(
+  message: string | Error | null,
+  title: string = '错误',
+  tipText: string = '你可以选择截图并联系开发人员'
+): AlertDialogParam {
+  let result: AlertDialogParamWithConfirm = {
+    title: title,
+    message: `${message}\n`+tipText,
+    confirm: {
+      value: '确认',
+      action: () => {}
+    }
+  }
+  return result
+}
 
 class BasicDataSource implements IDataSource{
   listeners: DataChangeListener[] = [];
@@ -84,6 +102,10 @@ function fetchData(): Promise<string> {
   });
 }
 
+const testCountKey: string = 'test_count_key';
+
+let testKVStore: distributedKVStore.SingleKVStore | undefined;
+
 @Component
 export struct Second {
   @State message: string = 'Hi there';
@@ -93,15 +115,45 @@ export struct Second {
   @Consume('navPathStack') navPathStack: NavPathStack
   arr: BasicDataSource = new BasicDataSource([1,2,3,4,5,6,7,8,9,10]);
 
+  async aboutToAppear(): Promise<void> {
+    console.debug(`即将初始化数据库`)
+    try {
+      testKVStore = await kvManager?.getKVStore<distributedKVStore.SingleKVStore>('testStore1', {
+        securityLevel: distributedKVStore.SecurityLevel.S1
+      })
+      console.debug(`创建/获取数据库实例成功`)
+      try {
+        let value = await testKVStore?.get(testCountKey)
+        if(value == undefined) {
+          throw new Error('键值为空')
+        }
+        this.testCount1 = value as number
+        console.debug(`获取数据成功：${value}`)
+      } catch (error) {
+        console.error(`获取数据失败：${error}`)
+      }
+    } catch (error) {
+      console.error(`创建/获取数据库实例失败：${error}`)
+    }
+    console.debug(`键值对获取部分完成`)
+  }
   build() {
     NavDestination(){
       List({space: 20}){
         ListItem(){
           Row(){
-            Text('Hello')
+            Text('删除数据库')
               .height('100%').fontSize(30)
               .textAlign(TextAlign.Center).borderRadius(3)
               .backgroundColor('#100D9FFB')
+              .onClick(async () => {
+                try {
+                  await testKVStore?.delete(testCountKey)
+                  console.debug(`删除数据成功`)
+                } catch (e){
+                  console.error(`删除数据失败：${e}`)
+                }
+              })
             Column(){
               Button('Next')
                 .fontSize(25)
@@ -114,16 +166,20 @@ export struct Second {
                 .fontSize(25)
                 .width('80%')
                 .margin({top: 20})
-                .onClick(() => {
+                .onClick(async () => {
                   this.testCount1++;
-                  this.getUIContext().showAlertDialog({
-                    title: '警告弹窗',
-                    message: 'cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++cnt++',
-                    confirm: {
-                      value: '确认',
-                      action: () => {}
+                  this.getUIContext().showAlertDialog(
+                    buildAlertDialogParams(this.testCount1.toString(), 'Test')
+                  )
+                  try {
+                    if (testKVStore == null) {
+                      throw new Error('数据库实例为空')
                     }
-                  })
+                    await testKVStore?.put(testCountKey, this.testCount1)
+                    console.debug(`存储数据成功：${this.testCount1}`)
+                  } catch (e){
+                    console.error(`存储数据失败：${e}`)
+                  }
                 })
             }
             .width('40%')
@@ -151,8 +207,8 @@ export struct Second {
     .onVisibleAreaChange([0.0, 1.0], async (isExpand, radio) => {
       if (isExpand) {
         const testResult = await fetchData()
-        console.debug(`调试得到结果：${testResult}`)
-        console.debug("调试可见区域展开")
+        console.debug(`得到结果：${testResult}`)
+        console.debug("可见区域展开")
       }
     })
   }
