@@ -7,6 +7,12 @@ export enum PageName{
   Third = "Third"
 }
 
+function delayWithPromise(ms: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 @Entry
 @Component
 struct Index {
@@ -45,8 +51,10 @@ struct Index {
           .backgroundColor('#0D9FFB')
           .width('40%')
           .height('5%')
-          .onClick(() => {
+          .onClick(async () => {
             this.navPathStack.pushPath({name : PageName.Second})
+            await delayWithPromise(5000)
+            console.debug("调试：延迟时间结束")
           })
         }.width('100%')
       }
