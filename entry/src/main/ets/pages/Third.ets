@@ -1,4 +1,5 @@
 import { http } from "@kit.NetworkKit"
+import url from "@ohos.url"
 
 
 @Component
@@ -7,6 +8,7 @@ export struct Third{
 
   @State responseText: string = '响应内容'
   @State textContent: string = ''
+
 
   build() {
     NavDestination(){
@@ -21,21 +23,24 @@ export struct Third{
           Button('Fetch')
             .fontSize(25)
             .width('60%')
-            .onClick(() => {
+            .onClick(async () => {
               let httpRequest = http.createHttp();
-              httpRequest.request(this.textContent, (err: BusinessError, httpResponse: http.HttpResponse) => {
-                if(!err){
-                  console.debug('URL请求成功')
-                  this.responseText = `状态码：${httpResponse.responseCode}\n结果：${httpResponse.result}\n}`
-                }else{
-                  console.debug('URL请求失败')
-                  this.responseText = `错误码：${err.code}\n消息：${err.message}\n数据：${err.data}`
-                }
+              try {
+                let response = await httpRequest.request(this.textContent)
+                console.debug('调试：请求成功')
+                this.responseText = `状态码：${response.responseCode}\n结果：${response.result}\n}`
+                return
+              } catch (e){
+                console.debug('调试：${e}')
+                return
+              } finally {
                 httpRequest.destroy()
-              })
+                console.debug('调试：销毁成功')
+              }
             })
           Text(this.textContent)
             .fontSize(26)
+          Text()
           Divider()
             .margin({top: '2%', bottom: '2%'})
           List(){
