@@ -1,10 +1,12 @@
 import { BusinessError } from '@kit.BasicServicesKit';
+import { Forth } from './Forth';
 import { Second } from './Second';
 import { Third } from './Third';
 
 export enum PageName{
   Second = "Second",
-  Third = "Third"
+  Third = "Third",
+  Forth = "Forth",
 }
 
 function delayWithPromise(ms: number) {
@@ -24,9 +26,10 @@ struct Index {
   pageMap(name: string){
     if(name == PageName.Second){
       Second()
-    }
-    if(name == PageName.Third){
-      Third()
+    }else if(name == PageName.Third){
+      Forth()
+    }else if(name == PageName.Forth){
+      Forth()
     }
   }
 
@@ -53,8 +56,6 @@ struct Index {
           .height('5%')
           .onClick(async () => {
             this.navPathStack.pushPath({name : PageName.Second})
-            await delayWithPromise(5000)
-            console.debug("调试：延迟时间结束")
           })
         }.width('100%')
       }
