@@ -196,17 +196,17 @@ export struct Second {
         }
         .width('100%').height('20%')
         ListItem(){
-          Button('Forth')
-            .onClick(() => {
-              this.navPathStack.pushPath({name: PageName.Forth})
-            })
-          // Row(){
-          //   Column(){
-          //   }.width('50%').height('100%')
-          //   Column(){
-          //
-          //   }.width('50%').height('100%')
-          // }.width('100%').height('100%')
+          Row(){
+            Column(){
+              Button('Forth')
+                .onClick(() => {
+                  this.navPathStack.pushPath({name: PageName.Forth})
+                })
+            }.width('50%').height('100%')
+            Column(){
+
+            }.width('50%').height('100%')
+          }.width('100%').height('100%')
         }
         .width('100%').height('20%')
         LazyForEach(this.arr, (item: number) => {
