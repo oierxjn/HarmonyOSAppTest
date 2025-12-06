@@ -3,11 +3,8 @@ import { JSON } from "@kit.ArkTS"
 function processJson(jsonStr: string){
   let jsonObj: Object = JSON.parse(jsonStr)!!
   let responseCode: string = (jsonObj as object)?.['code']
-  console.debug(`调试：响应码：${responseCode}`)
   let responseData: Object = (jsonObj as object)?.['data']
-  console.debug(`调试：响应数据：${responseData}`)
   let responseName: string = (responseData as object)?.['simpleName']
-  console.debug(`调试：响应名称：${responseName}`)
 }
 
 
@@ -19,13 +16,8 @@ export struct Forth{
   @State showText: string = '屏幕内容'
   @Consume('navPathStack') navPathStack: NavPathStack
 
-  aboutToAppear(): void {
-    console.debug(`调试：即将启动Forth`)
-  }
+  testCnt: number = 0;
 
-  onDidBuild(): void {
-    console.debug(`调试：Forth已经构建完成`)
-  }
 
   build() {
     NavDestination(){
@@ -37,11 +29,15 @@ export struct Forth{
         Text('HelloWorld')
         Button(`Play`)
           .onAreaChange((_, newValue) => {
-            console.debug(`调试：按钮区域改变\n${JSON.stringify(newValue)}`)
+            console.debug(`按钮区域改变\n${JSON.stringify(newValue)}`)
           })
           .onClick(() => {
+            this.testCnt++
+            this.showText =this.testCnt.toString()
             processJson(this.jsonText)
           })
+        Text(Number('114514').toString())
+          .fontSize(25)
       }
       .height('100%').width('100%')
     }
