@@ -163,7 +163,7 @@ export struct Second {
                 .backgroundColor('#100D9FFB')
             }.width('60%')
             Column(){
-              Button('Next')
+              Button('Third')
                 .fontSize(25)
                 .width('100%')
                 .margin({top: 20})
@@ -193,6 +193,20 @@ export struct Second {
             }
             .width('40%')
           }
+        }
+        .width('100%').height('20%')
+        ListItem(){
+          Button('Forth')
+            .onClick(() => {
+              this.navPathStack.pushPath({name: PageName.Forth})
+            })
+          // Row(){
+          //   Column(){
+          //   }.width('50%').height('100%')
+          //   Column(){
+          //
+          //   }.width('50%').height('100%')
+          // }.width('100%').height('100%')
         }
         .width('100%').height('20%')
         LazyForEach(this.arr, (item: number) => {
